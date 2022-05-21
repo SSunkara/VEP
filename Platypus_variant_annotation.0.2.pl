@@ -108,8 +108,6 @@ while(<INVCF>) {
 my $var_ids_json_str = encode_json(\@var_ids);
 my $jsonfile = "variants.json";
 
-print "$var_ids_json_str\n";
-
 open(VARJSON, ">$jsonfile") || die "Cannot open $jsonfile file to write to $!\n";
 print VARJSON $var_ids_json_str;
 close VARJSON;
