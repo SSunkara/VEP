@@ -79,6 +79,9 @@ sub read_vcf {
             my $perc_ref;
 
             if (scalar(@alt_alleles == 1) == 1) {
+
+                ### INFO field 'TC': Total coverage at this locus
+                ### INFO field 'TR' : Total number of reads containing this variant
             
                 $perc_var = (int($info{'TR'})/int($info{'TC'})) * 100;
                 $perc_ref = int($info{'TC'} - $info{'TR'})/int($info{'TC'}) * 100;
@@ -122,11 +125,11 @@ sub var_annotation {
     my ($chr, $coord, $alt_allele) = @_;
     my ($gene, $effect, $minor_allele, $minor_allele_freq, $somatic, $id);
 
-    my $response = make_rest_call($chr, $coord, $alt_allele);                                       ### $response is a hash
+    my $response = make_rest_call($chr, $coord, $alt_allele);                                       ### $response is a hash reference
 
-    if((length $response->{content}) && ($response->{success})) {
+    if((length $response->{content}) && ($response->{success})) {                                   ### if the content is non-zero and the query executed successfully, annotate variant
 
-        my $hash = decode_json($response->{content});                                               ### Array reference
+        my $hash = decode_json($response->{content});                                               ### $hash is Array reference
 
         $effect = "$hash->[0]{'most_severe_consequence'}";          
         $gene = "${$hash->[0]{'transcript_consequences'}}[0]->{'gene_symbol'}";                     ### ${$hash->[0]{'transcript_consequences'}}[0] is a hash
@@ -134,8 +137,8 @@ sub var_annotation {
         for (my $k = 0; $k <= $#{$hash->[0]{'colocated_variants'}}; $k++) {
             $minor_allele = "${$hash->[0]{'colocated_variants'}}[$k]->{'minor_allele'}";
             $minor_allele_freq = "${$hash->[0]{'colocated_variants'}}[$k]->{'minor_allele_freq'}";   
-            $somatic = "${$hash->[0]{'colocated_variants'}}[$k]->{'somatic'}";                      ### somatic?
-            $id = "${$hash->[0]{'colocated_variants'}}[$k]->{'id'}";                                ### snp id
+            $somatic = "${$hash->[0]{'colocated_variants'}}[$k]->{'somatic'}";                      ### variant somatic?
+            $id = "${$hash->[0]{'colocated_variants'}}[$k]->{'id'}";                                ### snp id (rsid or COSMIC ID)
         }
        
     }
@@ -144,6 +147,9 @@ sub var_annotation {
         
 }
 
+#########################################################################
+#### Make a GET rest api call to the VEP endpoint
+#########################################################################
 
 sub make_rest_call {
 
@@ -155,7 +161,7 @@ sub make_rest_call {
                    }
     });
 
-    if(!$response->{success}) {                                             ### If 429 error encountered, try again
+    if(!$response->{success}) {                                             ### If 429 error (timeout) encountered, try again based on the value in $response->{headers}->{'retry-after'}
 
         if($response->{status} == 429 && exists $response->{headers}->{'retry-after'}) {
             my $retry = $response->{headers}->{'retry-after'};
@@ -169,7 +175,7 @@ sub make_rest_call {
 
     }
 
-    return $response;
+    return $response;                                                      ### response is a hash reference 
 
 
 }
