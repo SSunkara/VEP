@@ -14,7 +14,7 @@ ID (rsid or COSMIC)
 - Code tested on macOS Catalina (10.15.7)
 - Iterating over 11000 variants sequentially at the GET endpoint took a couple of hours.
 - POST endpoint is preferable with a batch submission of 200 variants per batch (for annotation).\
-  My POST endpoint version of the script had issues with some JSON string malformation issues. Working on debugging the issue.\
+  My POST endpoint version of the script had issues with some JSON string malformation issues. Working on debugging the issue.
 - The best way to run the VEP annotation is by downloading cache of the database locally, and running queries against the cached version.\
   For the sake of this exercise, that hasn't been done.
 
