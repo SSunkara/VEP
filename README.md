@@ -1,7 +1,7 @@
 # VEP
 Variant annotation using the VEP REST api, specifically GET vep/:species/region/:region/:allele/ \
-Input file is test_vcf_data.txt
-Output file is annotations.csv
+Input file is test_vcf_data.txt \
+Output file is annotations.csv \
 Annotations for the test_vcf_data.txt have been uploaded in a csv format to annotations.csv\
 \
 Annotations include:\
